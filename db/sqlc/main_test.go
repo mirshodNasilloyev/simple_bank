@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mirshodNasilloyev/simplebank-go/db/utils"
 	"log"
 	"os"
 	"testing"
@@ -11,16 +12,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbSource = "postgres://root:secret@localhost:5432/simple_bankdb?sslmode=disable"
-)
-
 var testQueries *Queries
 var testDB *pgxpool.Pool
 
 func TestMain(m *testing.M) {
-	var err error
-	testDB, err = pgxpool.New(context.Background(), dbSource)
+	config, err := utils.LoadConfig("../..")
+	if err != nil {
+		log.Fatalf("cannot load config file: %v", err)
+	}
+	testDB, err = pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatalf("error to connect database: %v", err)
 	}

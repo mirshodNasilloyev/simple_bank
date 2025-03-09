@@ -7,8 +7,6 @@ package db
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createTransfer = `-- name: CreateTransfer :one
@@ -68,10 +66,10 @@ OFFSET $4
 `
 
 type ListTransfersParams struct {
-	FromAccountID pgtype.Int8 `json:"from_account_id"`
-	ToAccountID   pgtype.Int8 `json:"to_account_id"`
-	Limit         int32       `json:"limit"`
-	Offset        int32       `json:"offset"`
+	FromAccountID int64 `json:"from_account_id"`
+	ToAccountID   int64 `json:"to_account_id"`
+	Limit         int32 `json:"limit"`
+	Offset        int32 `json:"offset"`
 }
 
 func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfers, error) {
@@ -85,7 +83,7 @@ func (q *Queries) ListTransfers(ctx context.Context, arg ListTransfersParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transfers
+	items := []Transfers{}
 	for rows.Next() {
 		var i Transfers
 		if err := rows.Scan(
