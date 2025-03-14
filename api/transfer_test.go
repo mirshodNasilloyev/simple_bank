@@ -59,6 +59,32 @@ func TestTransferAPI(t *testing.T) {
 				require.Equal(t, http.StatusOK, resp.Code)
 			},
 		},
+		{
+			name: "TODO Case for test",
+			body: gin.H{
+				"from_account_id": account1.ID,
+				"to_account_id":   account2.ID,
+				"amount":          amount,
+				"currency":        utils.USD,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user1.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account1.ID)).Times(1).Return(account1, nil)
+				store.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account2.ID)).Times(1).Return(account2, nil)
+
+				arg := db.TransferTxParams{
+					FromAccountId: account1.ID,
+					ToAccountId:   account2.ID,
+					Amount:        amount,
+				}
+				store.EXPECT().TransferTx(gomock.Any(), gomock.Eq(arg)).Times(1)
+			},
+			checkResponse: func(t *testing.T, resp *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, resp.Code)
+			},
+		},
 	}
 
 	for i := range testCases {

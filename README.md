@@ -1,0 +1,3 @@
+``
+brew install golang-migrate
+``
