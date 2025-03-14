@@ -15,8 +15,13 @@ import (
 )
 
 func TestTransferAPI(t *testing.T) {
-	account1 := randomAccount()
-	account2 := randomAccount()
+	user1, _ := randomUser(t)
+	user2, _ := randomUser(t)
+	//user3, _ := randomUser(t)
+
+	account1 := randomAccount(user1.Username)
+	account2 := randomAccount(user2.Username)
+	//account3 := randomAccount(user3.Username)
 	amount := int64(10)
 
 	testCases := []struct {
@@ -58,7 +63,7 @@ func TestTransferAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
